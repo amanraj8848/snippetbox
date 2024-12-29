@@ -13,26 +13,31 @@ func home(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
+	   // Initialize a slice containing the paths to the two files. Note that the 
+    // home.page.tmpl file must be the *first* file in the slice. 
+    files := []string{ 
+        "./ui/html/home.page.tmpl", 
+        "./ui/html/base.layout.tmpl", 
+		"./ui/html/footer.partial.tmpl",
+    } 
+ 
+    // Use the template.ParseFiles() function to read the files and store the 
+    // templates in a template set. Notice that we can pass the slice of file p
+    // as a variadic parameter? 
+    ts, err := template.ParseFiles(files...) 
+    if err != nil { 
+    	log.Println(err.Error()) 
+        http.Error(w, "Internal Server Error", 500) 
+        return 
+    } 
 	
-	// parse the home.page.tmpl file using template.ParseFiles
-	// this will allow us to execute the template and fill in the dynamic data
-	// if there is an error parsing the file, log the error and return a 500 status code
-	ts,err := template.ParseFiles("ui/html/home.page.tmpl")
-	if err != nil {
-		log.Println(err.Error())
-		http.Error(w, "Internal Server Error", 500)
-		return
-	}
 	// Execute the template and write the output to the http.ResponseWriter
 	// Passing 'nil' as the data since there is no dynamic data to inject
-	err = ts.Execute(w, nil)
-	if err != nil {
-		// Log the error message if template execution fails
-		log.Println(err.Error())
-		// Send a 500 Internal Server Error response to the client
-		http.Error(w, "Internal Server Error", 500)
-		return
-	}
+	err = ts.Execute(w, nil) 
+	if err != nil { 
+	log.Println(err.Error()) 
+	http.Error(w, "Internal Server Error", 500) 
+	} 
 
 	w.Write([]byte("hello world"))
 	
